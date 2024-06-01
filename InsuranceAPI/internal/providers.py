@@ -6,8 +6,6 @@ import os
 class DataProvider:
 
     def __init__(self):
-        print("------" + os.getcwd())
-
         self.users = pd.read_json("internal/data/clients.json")
         self.policies = pd.read_json("internal/data/policies.json")
 
