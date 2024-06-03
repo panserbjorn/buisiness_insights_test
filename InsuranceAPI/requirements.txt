@@ -25,11 +25,14 @@ mypy-extensions==1.0.0
 numpy==1.26.4
 orjson==3.10.3
 pandas==2.2.2
+pandas-stubs==2.2.2.240514
+psycopg2-binary==2.9.9
 pydantic==2.7.2
 pydantic-extra-types==2.7.0
 pydantic-settings==2.2.1
 pydantic_core==2.18.3
 Pygments==2.18.0
+PyJWT==2.8.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 python-multipart==0.0.9
@@ -43,6 +46,7 @@ SQLAlchemy==2.0.30
 starlette==0.37.2
 tomli==2.0.1
 typer==0.12.3
+types-pytz==2024.1.0.20240417
 typing_extensions==4.12.0
 tzdata==2024.1
 ujson==5.10.0
