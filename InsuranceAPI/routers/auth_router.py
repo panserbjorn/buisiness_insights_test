@@ -1,20 +1,39 @@
-from fastapi import APIRouter
+from typing import Annotated
+from fastapi import APIRouter, HTTPException
 from fastapi import Depends
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from sqlalchemy.orm import Session
 
 # Temporal will replace for database
 from internal.providers import DataProvider
 
+from internal import crud
+
 from database import get_db
+
+import jwt
 
 data = DataProvider()
 
 router = APIRouter()
 
+login_security = HTTPBasic()
+
 
 @router.post("/login", tags=["auth"], description="Login to the API")
-def login(db: Session = Depends(get_db)):
-    return {"login": "OK"}
+def login(
+    credentials: Annotated[HTTPBasicCredentials, Depends(login_security)],
+    db: Session = Depends(get_db),
+):
+    user = crud.get_user_by_email(db=db, email=credentials.username)
+    if not user:
+        return HTTPException(status_code=404, detail="User not found")
+    else:
+        # Generate a JWT token with the user role and user id
+        encoded_jwt = jwt.encode(
+            {"role": user.role, "id": user.id}, "secret", algorithm="HS256"
+        )
+        return {"token": encoded_jwt}
 
 
 @router.get("/users", tags=["users"], description="Get all users")
