@@ -1,7 +1,12 @@
 from typing import Annotated
 from fastapi import APIRouter, HTTPException
 from fastapi import Depends
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.security import (
+    HTTPAuthorizationCredentials,
+    HTTPBasic,
+    HTTPBasicCredentials,
+    HTTPBearer,
+)
 from sqlalchemy.orm import Session
 
 # Temporal will replace for database
@@ -36,8 +41,29 @@ def login(
         return {"token": encoded_jwt}
 
 
+role_security = HTTPBearer()
+
+
+def check_role(credentials: HTTPAuthorizationCredentials, role: str):
+    try:
+        decoded_jwt = jwt.decode(
+            credentials.credentials.encode("utf-8"),
+            "secret",
+            algorithms=["HS256"],
+        )
+        if decoded_jwt["role"] == role:
+            return True
+        else:
+            return False
+    except:
+        return False
+
+
 @router.get("/users", tags=["users"], description="Get all users")
-def get_users(db: Session = Depends(get_db)):
+def get_users(
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(role_security)],
+    db: Session = Depends(get_db),
+):
     return crud.get_users(db)
 
 

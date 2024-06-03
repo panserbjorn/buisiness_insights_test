@@ -1,5 +1,5 @@
 from os import getenv
-from sqlalchemy import Column, Integer, MetaData, String, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, MetaData, String, ForeignKey
 from sqlalchemy.orm import DeclarativeBase
 from typing import List
 from typing import Optional
@@ -28,12 +28,12 @@ class Base(DeclarativeBase):
 class Policy(Base):
     __tablename__ = "policies"
 
-    id: Mapped[str] = mapped_column(String(30), primary_key=True)
+    id: Mapped[str] = mapped_column(String(50), primary_key=True)
     amount_insured: Mapped[float] = mapped_column(Integer)
     inception_date: Mapped[str] = mapped_column(String(50))
-    installment_payment: Mapped[bool] = mapped_column(Integer)
+    installment_payment: Mapped[bool] = mapped_column(Boolean)
     email: Mapped[str] = mapped_column(String(50))
-    user_id: Mapped[str] = mapped_column(String(30), ForeignKey("users.id"))
+    user_id: Mapped[str] = mapped_column(String(50), ForeignKey("users.id"))
     user: Mapped["User"] = relationship("User", back_populates="policies")
 
     def __repr__(self):
@@ -43,7 +43,7 @@ class Policy(Base):
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[str] = mapped_column(String(30), primary_key=True)
+    id: Mapped[str] = mapped_column(String(50), primary_key=True)
     name: Mapped[str] = mapped_column(String(50))
     email: Mapped[str] = mapped_column(String(50))
     role: Mapped[Role] = mapped_column(String(10))
