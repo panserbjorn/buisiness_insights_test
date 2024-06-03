@@ -18,8 +18,8 @@ def get_users(db: Session) -> list[models.User]:
     return db.query(models.User).all()
 
 
-def get_user_policies(db: Session, user_id: str) -> list[models.Policy] | None:
-    user = get_user_by_id(db, user_id)
+def get_user_policies(db: Session, user_name: str) -> list[models.Policy] | None:
+    user = get_user_by_name(db, user_name)
     if user:
         return user.policies
     return None
