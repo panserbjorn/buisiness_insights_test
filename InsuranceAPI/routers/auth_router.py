@@ -10,15 +10,10 @@ from fastapi.security import (
 from sqlalchemy.orm import Session
 import jwt
 
-# Temporal will replace for database
-from internal.providers import DataProvider
-
 from internal import crud
 
 from database import get_db
 from internal.jwt_auth import check_token, check_role
-
-data = DataProvider()
 
 router = APIRouter()
 

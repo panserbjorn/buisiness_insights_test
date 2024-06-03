@@ -4,16 +4,10 @@ from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
-# Temporal will replace for database
-from internal.providers import DataProvider
-
 from internal import crud
 from internal.jwt_auth import check_role, check_token
 
 from database import get_db
-
-
-data = DataProvider()
 
 router = APIRouter()
 
