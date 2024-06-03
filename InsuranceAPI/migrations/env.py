@@ -9,6 +9,10 @@ from models.models import Base
 
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -51,6 +55,8 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        version_table_schema=target_metadata.schema,
+        include_schemas=True,
     )
 
     with context.begin_transaction():
@@ -73,7 +79,12 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            version_table_schema=target_metadata.schema,
+            include_schemas=True,
+        )
 
         with context.begin_transaction():
             context.execute(f"create schema if not exists {target_metadata.schema}")

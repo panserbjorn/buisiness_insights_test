@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: insurance
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    env_file:
+      - ../InsuranceAPI/.env.compose
+
+  app:
+    build:
+      context: ..
+      dockerfile: Operations/Dockerfile
+    restart: always
+    ports:
+      - 8000:8000
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - db
+    volumes:
+      - ../InsuranceAPI:/app
+    env_file:
+      - ../InsuranceAPI/.env.compose

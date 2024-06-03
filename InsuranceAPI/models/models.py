@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from os import getenv
+from sqlalchemy import Column, Integer, MetaData, String, ForeignKey
 from sqlalchemy.orm import DeclarativeBase
 from typing import List
 from typing import Optional
@@ -11,12 +12,16 @@ from sqlalchemy.orm import relationship
 import enum
 
 
+SCHEMA = getenv("DB_SCHEMA", "insurance")
+
+
 class Role(enum.Enum):
     admin = "admin"
     user = "user"
 
 
 class Base(DeclarativeBase):
+    metadata = MetaData(schema=SCHEMA)
     pass
 
 
