@@ -8,6 +8,7 @@ from fastapi.security import (
     HTTPBearer,
 )
 from sqlalchemy.orm import Session
+import jwt
 
 # Temporal will replace for database
 from internal.providers import DataProvider
@@ -15,8 +16,7 @@ from internal.providers import DataProvider
 from internal import crud
 
 from database import get_db
-
-import jwt
+from internal.jwt_auth import check_token, check_role
 
 data = DataProvider()
 
@@ -44,36 +44,36 @@ def login(
 role_security = HTTPBearer()
 
 
-def check_role(credentials: HTTPAuthorizationCredentials, role: str):
-    try:
-        decoded_jwt = jwt.decode(
-            credentials.credentials.encode("utf-8"),
-            "secret",
-            algorithms=["HS256"],
-        )
-        if decoded_jwt["role"] == role:
-            return True
-        else:
-            return False
-    except:
-        return False
-
-
 @router.get("/users", tags=["users"], description="Get all users")
 def get_users(
     credentials: Annotated[HTTPAuthorizationCredentials, Depends(role_security)],
     db: Session = Depends(get_db),
 ):
-    return crud.get_users(db)
+    if check_role(credentials, "admin"):
+        return crud.get_users(db)
+    else:
+        return HTTPException(status_code=403, detail="Forbidden")
 
 
 @router.get("/users/{user_id}", tags=["users"], description="Get a user by ID")
-def get_user_by_id(user_id: str, db: Session = Depends(get_db)):
+def get_user_by_id(
+    user_id: str,
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(role_security)],
+    db: Session = Depends(get_db),
+):
+    if not check_token(credentials=credentials):
+        return HTTPException(status_code=401, detail="Unauthorized")
     return crud.get_user_by_id(db, user_id)
 
 
 @router.get("/users/name/{user_name}", tags=["users"], description="Get a user by name")
-def get_user_by_name(user_name: str, db: Session = Depends(get_db)):
+def get_user_by_name(
+    user_name: str,
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(role_security)],
+    db: Session = Depends(get_db),
+):
+    if not check_token(credentials=credentials):
+        return HTTPException(status_code=401, detail="Unauthorized")
     return crud.get_user_by_name(db, user_name)
 
 
@@ -82,5 +82,12 @@ def get_user_by_name(user_name: str, db: Session = Depends(get_db)):
     tags=["users"],
     description="Get all policies for a user",
 )
-def get_user_policies(user_name: str, db: Session = Depends(get_db)):
-    return crud.get_user_policies(db, user_name)
+def get_user_policies(
+    user_name: str,
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(role_security)],
+    db: Session = Depends(get_db),
+):
+    if check_role(credentials, "admin"):
+        return crud.get_user_policies(db, user_name)
+    else:
+        return HTTPException(status_code=403, detail="Forbidden")
